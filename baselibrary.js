@@ -357,7 +357,7 @@ let doubleSaddle = (count) => {
 	let saddled = imposedPages(pages(count))
 	// let saddled = [[0,1],[2,3],[4,5],[6,7],[8,9],[10,11],[12,13],[14,15]]
 	let newsaddled = []
-	for(let i = 0; i<saddled.length-1;i++){
+	for(let i = 0; i<saddled.length;i++){
 		if (i%4==2 || i%4==3){
 			continue
 		}
@@ -366,7 +366,7 @@ let doubleSaddle = (count) => {
 		}
 	}
 
-	return newsaddled.flat()
+	return newsaddled
 }
 
 // console.log("PLAESS",doubleSaddle())
@@ -374,14 +374,19 @@ let doubleSaddle = (count) => {
 // must iter by 2?
 export let drawSaddleDouble = (p, spreads, sheets, spreadNum, centerx, y, y2) => {
 	let pagesArr = doubleSaddle(spreads.length)
-	let cur1 = pagesArr[spreadNum].map(num => Math.floor(num / 2))
+
+	let cur1 = pagesArr[spreadNum]
+	if (cur1) cur1 = cur1[0].map(num => Math.floor(num / 2))
+	else return
 
 	//1
 	drawVerso(p, spreads, sheets, centerx, y, cur1[0])
 	drawRecto(p, spreads, sheets, centerx, y, cur1[1])
 
 
-	let cur2 = pagesArr[spreadNum+1].map(num => Math.floor(num / 2))
+	let cur2 = pagesArr[spreadNum][1]
+	if (cur2) cur2=cur2.map(num => Math.floor(num / 2))
+	else return
 	//2
 	drawVerso(p, spreads, sheets, centerx, y2, cur2[0])
 	drawRecto(p, spreads, sheets, centerx, y2, cur2[1])

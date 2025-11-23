@@ -49,7 +49,7 @@ let sheet1 = {
 }
 let sheet4 = {
 	color: '#fff',
-	width, 
+	width,
 	height,
 
 	offset: {
@@ -59,24 +59,24 @@ let sheet4 = {
 }
 
 let load_json = () => {
-  let f = document.createElement("input");
-  f.style.display = "none";
-  f.type = "file";
-  f.name = "file";
-  f.onchange = (e2) => {
-    const [file] = e2.target.files;
-    console.log(file);
-    const reader = new FileReader;
-    reader.addEventListener("load", () => {
-      console.log(reader.result);
-      let val = JSON.parse(reader.result);
+	let f = document.createElement("input");
+	f.style.display = "none";
+	f.type = "file";
+	f.name = "file";
+	f.onchange = (e2) => {
+		const [file] = e2.target.files;
+		console.log(file);
+		const reader = new FileReader;
+		reader.addEventListener("load", () => {
+			console.log(reader.result);
+			let val = JSON.parse(reader.result);
 			contentsOne = val
 			render()
-    }, false);
-    if (file)
-      reader.readAsText(file);
-  };
-  f.click();
+		}, false);
+		if (file)
+			reader.readAsText(file);
+	};
+	f.click();
 };
 
 let el = document.querySelector(".q5")
@@ -96,7 +96,7 @@ let mapfn = fn => arr => arr.map(fn)
 p.preload = () => {
 	images.forEach((e, i) => e.image = p.loadImage(e.src))
 }
-p.setup = () =>{
+p.setup = () => {
 	p.createCanvas(s.inch(11).px, s.inch(17).px)
 	let el = document.querySelector(".q5")
 	el.style.transform = "scale(" + (1 / s.scale) * viewport + ")"
@@ -114,7 +114,6 @@ oninit.push(() => {
 })
 
 function render() {
-	p.background('#eee')
 
 	let transform = a => a
 		.map(mapfn(e => runa(e)))
@@ -122,7 +121,7 @@ function render() {
 
 	let limit = (r, start, end) => r.value() > end ? r.next(end) : r.value() < start ? r.next(start) : null
 	let sheetset1 = [sheet1, sheet2]
-	let sheetset2 = [sheet4, sheet4, sheet1, sheet4, sheet1, sheet4, sheet4,  sheet4, sheet4]
+	let sheetset2 = [sheet4, sheet4, sheet1, sheet4, sheet1, sheet4, sheet4, sheet4, sheet4]
 
 	let c1 = transform(contentsOne)
 	let c2 = transform(contentsTwo)
@@ -139,24 +138,27 @@ function render() {
 	// 		[f("set"), "signatures", signatures],
 	// 		[f("accordion"), p, o("signatures")]])
 
-	let y = (p.height - height.px)/2
+	let y = (p.height - height.px) / 2
 	if (printing) {
+		p.background('#fff')
 		drawSaddleDouble(p,
-				signatures[1].spreads,
-				signatures[1].sheets,
-				signatures[1].spreadNum,
-				p.width / 2,
-				s.em(1).px,
-				height.px +  s.inch(.5).px,
-			)
+			signatures[1].spreads,
+			signatures[1].sheets,
+			signatures[1].spreadNum,
+			p.width / 2,
+			s.em(1).px,
+			height.px + s.inch(.5).px,
+		)
 	}
-	else
+	else {
+		p.background('#eee')
 		drawSignature(p,
 			signatures[1].spreads,
 			signatures[1].sheets,
 			p.width / 2, y,
 			signatures[1].spreadNum
 		)
+	}
 }
 
 let contentsOne = [
@@ -303,11 +305,13 @@ let selected = (i, address) => {
 	let addy = [...address]
 	if (i != undefined) { addy.push(i) }
 	let addy_str = addy.join('-')
-	return { address: addy_str, selected: addy_str == cursor.value().join('-'), onclick: (e) => {
+	return {
+		address: addy_str, selected: addy_str == cursor.value().join('-'), onclick: (e) => {
 			e.stopImmediatePropagation()
 			e.stopPropagation()
 			cursor.next([...addy])
-		}}
+		}
+	}
 }
 let defaultrenderer = (el, i, a, change) => {
 	if (Array.isArray(el)) { return arrayui(el, a.concat([i])) }
@@ -351,10 +355,10 @@ let ui = dom(
 	[".root",
 		sidebar,
 		['.ui',
-			...pagenums.map(num => ['div',
-				button(() => num.next(v => v + 1), 'next'),
-				['span.number', num],
+		 ...pagenums.slice(1,2).map(num => ['div',
 				button(() => num.next(v => v - 1), 'prev'),
+				['span.number', num],
+				button(() => num.next(v => v + 1), 'next'),
 			]),
 
 			['div',
@@ -703,10 +707,10 @@ document.onkeydown = e => {
 		download_json(contentsOne)
 	}
 
-	if (e.key == 'L'){load_json()}
+	if (e.key == 'L') { load_json() }
 	if (e.key == 'G') {
-		let v =cursor.value()
-		if (current == contentsOne && v.length == 1){
+		let v = cursor.value()
+		if (current == contentsOne && v.length == 1) {
 			pagenums[1].next(v[0])
 		}
 	}

@@ -134,17 +134,17 @@ span.symbol {
 
 .ui {
 	position: fixed;
-	width: 80vw;
-	height: 80px;
-	bottom: 2vw;
-	left: 10vw;
-	border: 1px solid black;
-	display: grid;
-	grid-template-columns: repeat(5, 1fr);
+  height: 60px;
+  bottom: 2vw;
+  left: 10vw;
+  border: 1px solid black;
+  display: grid;
+  grid-template-columns: repeat(2, 300px);
+  background: white;
 }
 
 .ui > * {
-	margin: 1em;
+	margin: .5em;
 	display: grid;
 	font-size: .8em;
 	grid-template-columns: repeat(4, 70px);
@@ -155,7 +155,7 @@ button {
 	all: unset;
 	border: 1px solid black;
 	background: white;
-	padding: 1em;
+	padding: .5em;
 	user-select: none;
 }
 
