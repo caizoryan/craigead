@@ -1,9 +1,12 @@
 import { s } from "./scale.js"
 import { runa, f, o, isObject} from './runa.js'
 import {images, interview_zhang, grace, liang, zhu, interview_liang, interview_zhu,interview_park, liang_major , park_major , zhang_major , zhu_major } from "./data.js"
+import { hyphenateSync } from "./lib/hyphenator/hyphenate.js"
 
 export let setprinting = v => printing = v
 export let printing = false
+let funky_hyphens = false;
+let color_hyphens = false;
 
 export let tag_hooks = {
 	"+:name": {
@@ -14,6 +17,14 @@ export let tag_hooks = {
 		font_size: s.point(6.5),
 		positive_y: s.point(-1),
 		edge: 3,
+	},
+
+	"+:marker": {
+		font_weight: 600,
+		font_family: "untitled",
+		color: '#2E8CFF',
+		font_size: s.point(6.5),
+		positive_y: s.point(-1),
 	},
 
 	'+:footnote': {
@@ -480,6 +491,7 @@ Takes text and length, and returns overflowed text.
 TODO: Return amount to skip/add or smth + text...
 */
 function draw_line(p, text, x, y, length, state, hooks) {
+	let last = {}
 	if (text.charAt(0) == `\n`) {
 		if (text.charAt(1) == `\n`) {
 			return { text: text.slice(2), leading: 1.1 }
@@ -563,7 +575,13 @@ function draw_line(p, text, x, y, length, state, hooks) {
 		let word_len = p.textWidth(word)
 
 		let tag = tag_hooks[word.toLowerCase()]
+		if (word.toLowerCase() == '+:/reset'){
+			tag = last
+		}
 		if (tag) {
+			last = {}
+			Object.assign(last, state.paragraph)
+
 			p.noStroke();
 			p.textSize(state.paragraph.font_size.px)
 			p.textFont(state.paragraph.font_family)
@@ -725,7 +743,7 @@ function draw_paragraph(p, paragraph, grid) {
 		font_size: { px: 14 },
 		rect: false,
 		hooks: {},
-		hyphenate: false
+		hyphenate: true
 	}, paragraph)
 
 
