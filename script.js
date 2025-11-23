@@ -3,7 +3,7 @@ import { reactive, memo } from './hok.js'
 import { dom } from './dom.js'
 import { s } from "./scale.js"
 import { runa, o, f, isFunction, fn, isObject, isScopedFunction, isSymbol } from './runa.js'
-import { printing, drawSaddle, drawSignature, setprinting, foot, signature, spread } from './baselibrary.js'
+import { printing, drawSaddle, drawSignature, setprinting, foot, signature, spread, drawSaddleDouble } from './baselibrary.js'
 import { images } from "./data.js"
 
 let inc = .5
@@ -25,7 +25,7 @@ let renderers = {
 }
 let width = s.inch(10)
 let height = s.inch(8)
-let viewport = 1.2
+let viewport = .7
 
 let sheet2 = {
 	color: '#dff',
@@ -97,7 +97,7 @@ p.preload = () => {
 	images.forEach((e, i) => e.image = p.loadImage(e.src))
 }
 p.setup = () =>{
-	p.createCanvas(s.inch(11).px, s.inch(8.5).px)
+	p.createCanvas(s.inch(11).px, s.inch(17).px)
 	let el = document.querySelector(".q5")
 	el.style.transform = "scale(" + (1 / s.scale) * viewport + ")"
 }
@@ -141,13 +141,13 @@ function render() {
 
 	let y = (p.height - height.px)/2
 	if (printing) {
-		drawSaddle
-			(p,
+		drawSaddleDouble(p,
 				signatures[1].spreads,
 				signatures[1].sheets,
+				signatures[1].spreadNum,
 				p.width / 2,
-				y,
-				signatures[1].spreadNum
+				s.em(1).px,
+				height.px +  s.inch(.5).px,
 			)
 	}
 	else

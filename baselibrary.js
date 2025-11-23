@@ -1,6 +1,7 @@
 import { s } from "./scale.js"
 import { runa, f, o, isObject} from './runa.js'
-import {images, interview_zhang, grace, liang, zhu, interview_liang, interview_zhu,interview_park, liang_major , park_major , zhang_major , zhu_major } from "./data.js"
+import {images, interview_zhang, grace, liang, zhu, interview_liang, interview_zhu,interview_park,
+				liang_major , park_major , zhang_major , zhu_major, liang_amajor , park_amajor , zhu_amajor,} from "./data.js"
 import { hyphenateSync } from "./lib/hyphenator/hyphenate.js"
 
 export let setprinting = v => printing = v
@@ -26,6 +27,9 @@ export let tag_hooks = {
 		font_size: s.point(6.5),
 		positive_y: s.point(-1),
 	},
+
+	'+:italic':  {font_style: "ITALIC"},
+	'+:notitalic':  {font_style: "NORMAL"},
 
 	'+:footnote': {
 		font_weight: 600,
@@ -339,8 +343,67 @@ export let drawSaddle = (p, spreads, sheets, centerx, y, spreadNum) => {
 	let pagesArr = imposedPages(pages(spreads.length))
 	let cur = pagesArr[spreadNum].map(num => Math.floor(num / 2))
 
+	let dim = sheets[spreadNum]
+	let x = centerx - (dim.width.px / 2)
+	let _y = y + dim.offset.vertical.px
+
+	drawCropMarks(p, x, _y, dim.width.px, dim.height.px)
 	drawVerso(p, spreads, sheets, centerx, y, cur[0])
 	drawRecto(p, spreads, sheets, centerx, y, cur[1])
+
+}
+
+let doubleSaddle = (count) => {
+	let saddled = imposedPages(pages(count))
+	// let saddled = [[0,1],[2,3],[4,5],[6,7],[8,9],[10,11],[12,13],[14,15]]
+	let newsaddled = []
+	for(let i = 0; i<saddled.length-1;i++){
+		if (i%4==2 || i%4==3){
+			continue
+		}
+		else {
+			newsaddled.push([saddled[i], saddled[i+2]])
+		}
+	}
+
+	return newsaddled.flat()
+}
+
+// console.log("PLAESS",doubleSaddle())
+
+// must iter by 2?
+export let drawSaddleDouble = (p, spreads, sheets, spreadNum, centerx, y, y2) => {
+	let pagesArr = doubleSaddle(spreads.length)
+	let cur1 = pagesArr[spreadNum].map(num => Math.floor(num / 2))
+
+	//1
+	drawVerso(p, spreads, sheets, centerx, y, cur1[0])
+	drawRecto(p, spreads, sheets, centerx, y, cur1[1])
+
+
+	let cur2 = pagesArr[spreadNum+1].map(num => Math.floor(num / 2))
+	//2
+	drawVerso(p, spreads, sheets, centerx, y2, cur2[0])
+	drawRecto(p, spreads, sheets, centerx, y2, cur2[1])
+
+}
+
+let drawCropMarks = (p, left, top, width, height, spine) => {
+	// crop marks
+	// p.strokeWeight(10)
+	// p.rect(left, top, width, height)
+	p.line(left, 0, left, top)
+	p.line(0, top, left, top)
+
+	p.line(p.width - left, 0, p.width - left, top)
+	p.line(p.width, top, p.width - left, top)
+
+	p.line(0, p.height - top, left, p.height - top)
+	p.line(left, p.height, left, p.height - top)
+
+	p.line(p.width, p.height - top, p.width - left, p.height - top)
+	p.line(p.width - left, p.height, p.width - left, p.height - top)
+
 }
 
 let drawRecto = (p, spreads, sheets, centerx, y, spreadNum, draw_behind = false) => {
@@ -575,9 +638,8 @@ function draw_line(p, text, x, y, length, state, hooks) {
 		let word_len = p.textWidth(word)
 
 		let tag = tag_hooks[word.toLowerCase()]
-		if (word.toLowerCase() == '+:/reset'){
-			tag = last
-		}
+		if (word.toLowerCase() == '+:/reset'){tag = last}
+
 		if (tag) {
 			last = {}
 			Object.assign(last, state.paragraph)
@@ -586,18 +648,14 @@ function draw_line(p, text, x, y, length, state, hooks) {
 			p.textSize(state.paragraph.font_size.px)
 			p.textFont(state.paragraph.font_family)
 			p.textWeight(state.paragraph.font_weight)
+
 			p.fill(state.paragraph.color)
-			p.textStyle(p.NORMAL)
 
 			if (tag.edge) {
 				// check if the next two words will fit in the line or else break
 				let curhor = line_state.horizontal_pos 
 				let word_lens = words.slice(index, index+tag.edge).reduce((acc, e) => acc+=p.textWidth(e), 0)
-				console.log('LENGTH', word_lens)
-				console.log('curhor', curhor)
-				console.log('max', length.px, curhor+word_lens)
 				if (curhor + word_lens > length.px){
-					console.log('GOTTA LINE BREAK')
 					skip = true
 					return
 				}
@@ -732,6 +790,7 @@ function draw_paragraph(p, paragraph, grid) {
 		text: "",
 		font_family: "monospace",
 		font_weight: 300,
+		font_style: 'NORMAL',
 		x: { px: 10 },
 		y: { px: 10 },
 		height: { px: 100 },
@@ -751,6 +810,7 @@ function draw_paragraph(p, paragraph, grid) {
 	p.textFont(_paragraph.font_family)
 	p.textWeight(_paragraph.font_weight)
 	p.textLeading(_paragraph.leading.px)
+	p.textStyle(p.NORMAL)
 
 	/**@type ParagraphState*/
 	let paragraph_state = {
@@ -795,7 +855,7 @@ function draw_paragraph(p, paragraph, grid) {
 		p.textFont(_paragraph.font_family)
 		p.textWeight(_paragraph.font_weight)
 		p.fill(_paragraph.color)
-		p.textStyle(p.NORMAL)
+		p.textStyle(p[_paragraph.font_style]);
 
 		p.textLeading(_paragraph.leading.px)
 
@@ -883,6 +943,7 @@ export let rootenv = {
 	"key": (args) => args[0][args[1]],
 	interview_zhang,interview_liang,interview_park,interview_zhu,
 	grace,liang,zhu,liang_major, park_major, zhang_major, zhu_major,
+	liang_amajor , park_amajor , zhu_amajor,
 	"set" : (args, env) => env[args[0]] = runa(args[1], env),
 	'progn': (args, env) =>{
 		let f = runa(args, env)
