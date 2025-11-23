@@ -430,6 +430,20 @@ let drawRecto = (p, spreads, sheets, centerx, y, spreadNum, draw_behind = false)
 
 	p.image(recto, centerx, y, recto_dimensions.width.px, recto_dimensions.height.px)
 
+	if (printing){
+		// draw crop marks
+		p.stroke(0)
+		p.strokeWeight(1)
+		let vx = centerx
+		let vy = y
+		let vxw = (vx+recto_dimensions.width.px)
+		p.line(vxw, vy-s.em(1).px, vxw, vy)
+		p.line(vxw+s.em(1).px, vy, vxw, vy)
+
+		p.line(vxw, (vy+recto_dimensions.height.px)+s.em(1).px, vxw, (vy+recto_dimensions.height.px))
+		p.line(vxw+s.em(1).px, (vy+recto_dimensions.height.px), vxw, (vy+recto_dimensions.height.px))
+	}
+
 }
 let drawVerso = (p, spreads, sheets, centerx, y, spreadNum, draw_behind = false) => {
 	if (spreadNum == 0) return
@@ -453,6 +467,16 @@ let drawVerso = (p, spreads, sheets, centerx, y, spreadNum, draw_behind = false)
 	}
 
 	p.image(verso, vx, vy, verso_dimensions.width.px, verso_dimensions.height.px)
+	if (printing){
+		// draw crop marks
+		p.stroke(0)
+		p.strokeWeight(1)
+		p.line(vx, vy-s.em(1).px, vx, vy)
+		p.line(vx-s.em(1).px, vy, vx, vy)
+
+		p.line(vx, (vy+verso_dimensions.height.px)+s.em(1).px, vx, (vy+verso_dimensions.height.px))
+		p.line(vx-s.em(1).px, (vy+verso_dimensions.height.px), vx, (vy+verso_dimensions.height.px))
+	}
 }
 let pageImage = (p, spreads, sheets, spreadNum,) => {
 	let spread = Math.floor(spreadNum / 2)
